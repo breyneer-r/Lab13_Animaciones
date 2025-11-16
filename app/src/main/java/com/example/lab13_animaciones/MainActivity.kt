@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Ejercicio2_AnimateColorAsState(modifier: Modifier = Modifier) {
-    // 1. Variable de estado booleana para alternar el color.
+    // 1. Variable de estado booleana para alternar el color.//
     var isBlue by remember { mutableStateOf(true) }
 
     // Definir los colores objetivo (Azul y Verde)
