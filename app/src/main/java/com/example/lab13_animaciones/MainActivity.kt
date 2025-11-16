@@ -5,11 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,8 +41,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             Lab13_AnimacionesTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // 🚩 Llamada al Ejercicio 1
-                    Ejercicio1_AnimatedVisibility(modifier = Modifier.padding(innerPadding))
+                    // 🚩 Llamada al Ejercicio 2
+                    Ejercicio2_AnimateColorAsState(modifier = Modifier.padding(innerPadding))
+
+                    // Para probar el Ejercicio 1 de nuevo, usa:
+                    // Ejercicio1_AnimatedVisibility(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -48,13 +53,56 @@ class MainActivity : ComponentActivity() {
 }
 
 // ----------------------------------------------------
+// 🎨 Ejercicio 2: Cambio de Color con animateColorAsState
+// ----------------------------------------------------
+
+@Composable
+fun Ejercicio2_AnimateColorAsState(modifier: Modifier = Modifier) {
+    // 1. Variable de estado booleana para alternar el color.
+    var isBlue by remember { mutableStateOf(true) }
+
+    // Definir los colores objetivo (Azul y Verde)
+    val targetColor = if (isBlue) Color(0xFF2196F3) else Color(0xFF4CAF50)
+
+    // 2. Usar animateColorAsState para animar la transición del color de forma continua.
+    val animatedColor by animateColorAsState(
+        targetValue = targetColor,
+        // 3. Experimentación: Usa 'tween' (transición suave de 1 seg) o 'spring()' (efecto elástico).
+        animationSpec = tween(durationMillis = 1000),
+        label = "Color Animation"
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        // Botón para cambiar el estado
+        Button(
+            onClick = { isBlue = !isBlue },
+            modifier = Modifier.padding(bottom = 32.dp)
+        ) {
+            Text(text = "Cambiar a ${if (isBlue) "Verde" else "Azul"}")
+        }
+
+        // El cuadro que usa el color animado
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .background(animatedColor) // Color animado
+        )
+    }
+}
+
+// ----------------------------------------------------
 // 🚀 Ejercicio 1: Animación de Visibilidad con AnimatedVisibility
-// Permite mostrar u ocultar un elemento componible con efectos de entrada y salida
+// (Se mantiene en el archivo por si quieres probarlo de nuevo)
 // ----------------------------------------------------
 
 @Composable
 fun Ejercicio1_AnimatedVisibility(modifier: Modifier = Modifier) {
-    // 1. Variable de estado booleana para controlar la visibilidad.
     var isVisible by remember { mutableStateOf(true) }
 
     Column(
@@ -64,7 +112,6 @@ fun Ejercicio1_AnimatedVisibility(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        // 2. Botón que al hacer clic alterne la visibilidad del elemento
         Button(
             onClick = { isVisible = !isVisible },
             modifier = Modifier.padding(bottom = 32.dp)
@@ -72,28 +119,25 @@ fun Ejercicio1_AnimatedVisibility(modifier: Modifier = Modifier) {
             Text(text = if (isVisible) "Ocultar Cuadro" else "Mostrar Cuadro")
         }
 
-        // 3. Usa AnimatedVisibility para que el cuadro aparezca y desaparezca suavemente.
         AnimatedVisibility(
             visible = isVisible,
-            // 4. Configura las animaciones de entrada y salida con efectos como fadeIn y fadeOut.
             enter = fadeIn(animationSpec = spring()) + expandVertically(expandFrom = Alignment.Top),
             exit = fadeOut(animationSpec = spring()) + shrinkVertically(shrinkTowards = Alignment.Top)
         ) {
-            // El elemento componible (un cuadro de color)
             Box(
                 modifier = Modifier
                     .size(200.dp)
-                    .background(Color(0xFF00796B)) // Un color verde azulado
+                    .background(Color(0xFF00796B))
             )
         }
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun AnimationPreview() {
     Lab13_AnimacionesTheme {
-        Ejercicio1_AnimatedVisibility()
+        // Puedes cambiar aquí la función de previsualización si lo necesitas
+        Ejercicio2_AnimateColorAsState()
     }
 }

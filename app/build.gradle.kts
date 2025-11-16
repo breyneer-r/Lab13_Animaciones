@@ -6,13 +6,13 @@ plugins {
 
 android {
     namespace = "com.example.lab13_animaciones"
-    compileSdk {
-        version = release(36)
-    }
+    // Mantener en 36 para resolver los problemas de dependencias anteriores.
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.lab13_animaciones"
-        minSdk = 36
+        // CORRECCIÓN FINAL: Se actualiza a 26 para resolver el error de íconos adaptativos.
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    // Core Android/Kotlin/Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -50,6 +51,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+
+    // Dependencia para Animaciones (crucial para el lab)
+    implementation("androidx.compose.animation:animation")
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
