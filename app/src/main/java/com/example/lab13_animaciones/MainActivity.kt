@@ -12,11 +12,13 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateDpAsState // Importante para Ejercicio 3
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset // Importante para Ejercicio 3
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -41,14 +43,68 @@ class MainActivity : ComponentActivity() {
         setContent {
             Lab13_AnimacionesTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // 🚩 Llamada al Ejercicio 2
-                    Ejercicio2_AnimateColorAsState(modifier = Modifier.padding(innerPadding))
+                    // 🚩 Llamada al Ejercicio 3
+                    Ejercicio3_AnimateDpAsState(modifier = Modifier.padding(innerPadding))
 
-                    // Para probar el Ejercicio 1 de nuevo, usa:
+                    // Para probar otros ejercicios, descomenta el que necesites:
                     // Ejercicio1_AnimatedVisibility(modifier = Modifier.padding(innerPadding))
+                    // Ejercicio2_AnimateColorAsState(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
+    }
+}
+
+// ----------------------------------------------------
+// 📏 Ejercicio 3: Animación de Tamaño y Posición (animateDpAsState)
+// ----------------------------------------------------
+
+@Composable
+fun Ejercicio3_AnimateDpAsState(modifier: Modifier = Modifier) {
+    // 1. Variable de estado para alternar la posición y el tamaño
+    var isLarge by remember { mutableStateOf(false) }
+
+    // Definir los valores objetivo (en Dp)
+    val targetSize = if (isLarge) 250.dp else 100.dp
+    // Desplazamiento de 100 dp en X e Y
+    val targetOffset = if (isLarge) 100.dp else 0.dp
+
+    // 2. Usar animateDpAsState para animar el tamaño
+    val animatedSize by animateDpAsState(
+        targetValue = targetSize,
+        animationSpec = tween(durationMillis = 800),
+        label = "Size Animation"
+    )
+
+    // Usar animateDpAsState para animar el desplazamiento (posición)
+    val animatedOffset by animateDpAsState(
+        targetValue = targetOffset,
+        animationSpec = tween(durationMillis = 800),
+        label = "Offset Animation"
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Button(
+            onClick = { isLarge = !isLarge },
+            modifier = Modifier.padding(bottom = 32.dp)
+        ) {
+            Text(text = if (isLarge) "Restablecer" else "Agrandar y Mover")
+        }
+
+        // 3. Aplicar los modificadores animados.
+        // El orden es importante: primero la posición y luego el tamaño/fondo.
+        Box(
+            modifier = Modifier
+                .offset(x = animatedOffset, y = animatedOffset) // Posición animada
+                .size(animatedSize) // Tamaño animado
+                .background(Color(0xFFE91E63)) // Color rosado
+        )
     }
 }
 
@@ -58,16 +114,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Ejercicio2_AnimateColorAsState(modifier: Modifier = Modifier) {
-    // 1. Variable de estado booleana para alternar el color.//
     var isBlue by remember { mutableStateOf(true) }
-
-    // Definir los colores objetivo (Azul y Verde)
     val targetColor = if (isBlue) Color(0xFF2196F3) else Color(0xFF4CAF50)
-
-    // 2. Usar animateColorAsState para animar la transición del color de forma continua.
     val animatedColor by animateColorAsState(
         targetValue = targetColor,
-        // 3. Experimentación: Usa 'tween' (transición suave de 1 seg) o 'spring()' (efecto elástico).
         animationSpec = tween(durationMillis = 1000),
         label = "Color Animation"
     )
@@ -79,26 +129,22 @@ fun Ejercicio2_AnimateColorAsState(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        // Botón para cambiar el estado
         Button(
             onClick = { isBlue = !isBlue },
             modifier = Modifier.padding(bottom = 32.dp)
         ) {
             Text(text = "Cambiar a ${if (isBlue) "Verde" else "Azul"}")
         }
-
-        // El cuadro que usa el color animado
         Box(
             modifier = Modifier
                 .size(200.dp)
-                .background(animatedColor) // Color animado
+                .background(animatedColor)
         )
     }
 }
 
 // ----------------------------------------------------
 // 🚀 Ejercicio 1: Animación de Visibilidad con AnimatedVisibility
-// (Se mantiene en el archivo por si quieres probarlo de nuevo)
 // ----------------------------------------------------
 
 @Composable
@@ -137,7 +183,6 @@ fun Ejercicio1_AnimatedVisibility(modifier: Modifier = Modifier) {
 @Composable
 fun AnimationPreview() {
     Lab13_AnimacionesTheme {
-        // Puedes cambiar aquí la función de previsualización si lo necesitas
-        Ejercicio2_AnimateColorAsState()
+        Ejercicio3_AnimateDpAsState()
     }
 }
