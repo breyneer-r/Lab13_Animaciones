@@ -4,58 +4,32 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.*
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lab13_animaciones.ui.theme.Lab13_AnimacionesTheme
-
-// Imports y Modificadores para el Ejercicio Final
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.Dp
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import kotlin.random.Random
 
-// Enum para Ejercicio 4
 enum class ContentState {
     LOADING, CONTENT, ERROR
 }
@@ -67,14 +41,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             Lab13_AnimacionesTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // 🚩 Llamada al EJERCICIO FINAL
-                    EjercicioFinal_PrototipoVideojuego(modifier = Modifier.padding(innerPadding))
-
-                    // Para probar otros ejercicios, descomenta el que necesites:
-                    // Ejercicio1_AnimatedVisibility(modifier = Modifier.padding(innerPadding))
-                    // Ejercicio2_AnimateColorAsState(modifier = Modifier.padding(innerPadding))
-                    // Ejercicio3_AnimateDpAsState(modifier = Modifier.padding(innerPadding))
-                    // Ejercicio4_AnimatedContent(modifier = Modifier.padding(innerPadding))
+                    EjercicioFinal_PrototipoVideojuego(
+                        modifier = Modifier.padding(innerPadding)
+                    )
                 }
             }
         }
@@ -82,18 +51,16 @@ class MainActivity : ComponentActivity() {
 }
 
 // ----------------------------------------------------
-// 🎮 Ejercicio Final: Prototipo de Animación de Videojuego
-// Combinando animateDpAsState, animateColorAsState y AnimatedVisibility
+// 🎮 PROTOTIPO VIDEOJUEGO
 // ----------------------------------------------------
 
 @Composable
 fun EjercicioFinal_PrototipoVideojuego(modifier: Modifier = Modifier) {
-    // 1. Variables de Estado
-    var isAttacking by remember { mutableStateOf(false) } // Ataque (Controla AnimatedVisibility)
-    var isRight by remember { mutableStateOf(true) }      // Posición (Controla animateDpAsState)
-    var healthLevel by remember { mutableStateOf(100) }   // Salud (Controla animateColorAsState)
 
-    // 2. Animación de Posición (animateDpAsState)
+    var isAttacking by remember { mutableStateOf(false) }
+    var isRight by remember { mutableStateOf(true) }
+    var healthLevel by remember { mutableStateOf(100) }
+
     val targetPositionX: Dp = if (isRight) 200.dp else 50.dp
     val animatedPositionX by animateDpAsState(
         targetValue = targetPositionX,
@@ -101,23 +68,20 @@ fun EjercicioFinal_PrototipoVideojuego(modifier: Modifier = Modifier) {
         label = "Player Movement"
     )
 
-    // 3. Animación de Color (animateColorAsState)
     val targetColor = when {
-        healthLevel > 60 -> Color(0xFF4CAF50) // Verde
-        healthLevel > 30 -> Color(0xFFFFC107) // Amarillo
-        else -> Color(0xFFF44336) // Rojo (Baja salud)
+        healthLevel > 60 -> Color(0xFF4CAF50)
+        healthLevel > 30 -> Color(0xFFFFC107)
+        else -> Color(0xFFF44336)
     }
-    val animatedHealthColor by animateColorAsState(targetColor, label = "Health Color")
+    val animatedHealthColor by animateColorAsState(
+        targetValue = targetColor,
+        label = "Health Color"
+    )
 
-    // Lógica para simular movimiento, ataque y daño
     val performAction = {
-        // Al atacar, mostramos el efecto y reducimos la salud aleatoriamente
-        isAttacking = true
-        healthLevel = Random.nextInt(0, 101) // Nueva salud aleatoria
-        isRight = !isRight // Mover al personaje a la otra posición
-
-        // Alternar el estado de ataque (para que el botón también funcione como restablecer el ataque visual)
-        isAttacking = !isAttacking
+        isAttacking = !isAttacking   // Alternar ataque
+        healthLevel = Random.nextInt(0, 101)
+        isRight = !isRight
     }
 
     Column(
@@ -125,30 +89,44 @@ fun EjercicioFinal_PrototipoVideojuego(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Marcador de Salud
-        Text("HP: $healthLevel", color = animatedHealthColor, fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
-        // Contenedor de la acción de juego
-        Box(modifier = Modifier.fillMaxWidth().height(400.dp)) {
-            // Personaje Principal (Combina Posición y Color Animados)
+        Text(
+            "HP: $healthLevel",
+            color = animatedHealthColor,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp)
+        ) {
+
+            // Jugador
             Box(
                 modifier = Modifier
-                    .offset(x = animatedPositionX) // Posición X animada
+                    .offset(x = animatedPositionX)
                     .size(80.dp)
                     .clip(CircleShape)
-                    .background(animatedHealthColor) // Color animado (salud)
+                    .background(animatedHealthColor)
                     .border(2.dp, Color.Black, CircleShape)
-                    .clickable(onClick = performAction) // El personaje es interactivo
+                    .clickable(onClick = performAction)
                     .align(Alignment.TopStart)
             ) {
-                Text("P", Modifier.align(Alignment.Center), fontSize = 30.sp, color = Color.White)
+                Text(
+                    "P",
+                    Modifier.align(Alignment.Center),
+                    fontSize = 30.sp,
+                    color = Color.White
+                )
             }
 
-            // Efecto de Ataque (AnimatedVisibility)
-            AnimatedVisibility(
+            // Ataque
+            androidx.compose.animation.AnimatedVisibility(
                 visible = isAttacking,
-                enter = fadeIn(tween(durationMillis = 150)) + expandVertically(),
-                exit = fadeOut(tween(durationMillis = 400)),
+                enter = fadeIn(tween(150)) + expandVertically(),
+                exit = fadeOut(tween(400)),
                 modifier = Modifier
                     .offset(x = animatedPositionX + 80.dp, y = 10.dp)
                     .align(Alignment.TopStart)
@@ -159,7 +137,12 @@ fun EjercicioFinal_PrototipoVideojuego(modifier: Modifier = Modifier) {
                         .background(Color(0xFFFF5722).copy(alpha = 0.7f))
                         .clip(CircleShape)
                 ) {
-                    Text("¡HIT!", Modifier.align(Alignment.Center), color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(
+                        "¡HIT!",
+                        Modifier.align(Alignment.Center),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
@@ -170,9 +153,8 @@ fun EjercicioFinal_PrototipoVideojuego(modifier: Modifier = Modifier) {
     }
 }
 
-
 // ----------------------------------------------------
-// 🔄 Ejercicio 4: Cambio de Contenido con AnimatedContent
+// 🔄 Ejercicio 4
 // ----------------------------------------------------
 
 @Composable
@@ -192,16 +174,14 @@ fun Ejercicio4_AnimatedContent(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Button(onClick = nextState, modifier = Modifier.padding(bottom = 32.dp)) {
-            Text(text = "Cambiar Estado (Actual: $currentState)")
+            Text("Cambiar Estado (Actual: $currentState)")
         }
 
         AnimatedContent(
             targetState = currentState,
             transitionSpec = {
-                (slideInVertically(animationSpec = tween(600)) { height -> height } + fadeIn(tween(600)))
-                    .togetherWith(
-                        slideOutVertically(animationSpec = tween(600)) { height -> -height } + fadeOut(tween(600))
-                    )
+                (slideInVertically(tween(600)) { it } + fadeIn(tween(600)))
+                    .togetherWith(slideOutVertically(tween(600)) { -it } + fadeOut(tween(600)))
             },
             label = "State Change Content"
         ) { target ->
@@ -213,20 +193,30 @@ fun Ejercicio4_AnimatedContent(modifier: Modifier = Modifier) {
                         Text("Cargando datos...", fontSize = 20.sp)
                     }
                 }
+
                 ContentState.CONTENT -> {
-                    Text("¡Contenido cargado exitosamente!", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.Green)
+                    Text(
+                        "¡Contenido cargado exitosamente!",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Green
+                    )
                 }
+
                 ContentState.ERROR -> {
-                    Text("⚠️ Error al obtener datos. Intente de nuevo.", fontSize = 22.sp, color = Color.Red)
+                    Text(
+                        "⚠️ Error al obtener datos. Intente de nuevo.",
+                        fontSize = 22.sp,
+                        color = Color.Red
+                    )
                 }
             }
         }
     }
 }
 
-
 // ----------------------------------------------------
-// 📏 Ejercicio 3: Animación de Tamaño y Posición
+// 📏 Ejercicio 3
 // ----------------------------------------------------
 
 @Composable
@@ -237,12 +227,12 @@ fun Ejercicio3_AnimateDpAsState(modifier: Modifier = Modifier) {
 
     val animatedSize by animateDpAsState(
         targetValue = targetSize,
-        animationSpec = tween(durationMillis = 800),
+        animationSpec = tween(800),
         label = "Size Animation"
     )
     val animatedOffset by animateDpAsState(
         targetValue = targetOffset,
-        animationSpec = tween(durationMillis = 800),
+        animationSpec = tween(800),
         label = "Offset Animation"
     )
 
@@ -254,6 +244,7 @@ fun Ejercicio3_AnimateDpAsState(modifier: Modifier = Modifier) {
         Button(onClick = { isLarge = !isLarge }, modifier = Modifier.padding(bottom = 32.dp)) {
             Text(text = if (isLarge) "Restablecer" else "Agrandar y Mover")
         }
+
         Box(
             modifier = Modifier
                 .offset(x = animatedOffset, y = animatedOffset)
@@ -263,18 +254,19 @@ fun Ejercicio3_AnimateDpAsState(modifier: Modifier = Modifier) {
     }
 }
 
-
 // ----------------------------------------------------
-// 🎨 Ejercicio 2: Cambio de Color con animateColorAsState
+// 🎨 Ejercicio 2
 // ----------------------------------------------------
 
 @Composable
 fun Ejercicio2_AnimateColorAsState(modifier: Modifier = Modifier) {
     var isBlue by remember { mutableStateOf(true) }
-    val targetColor = if (isBlue) Color(0xFF2196F3) else Color(0xFF4CAF50)
+    val targetColor =
+        if (isBlue) Color(0xFF2196F3) else Color(0xFF4CAF50)
+
     val animatedColor by animateColorAsState(
         targetValue = targetColor,
-        animationSpec = tween(durationMillis = 1000),
+        animationSpec = tween(1000),
         label = "Color Animation"
     )
 
@@ -284,8 +276,9 @@ fun Ejercicio2_AnimateColorAsState(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Top
     ) {
         Button(onClick = { isBlue = !isBlue }, modifier = Modifier.padding(bottom = 32.dp)) {
-            Text(text = "Cambiar a ${if (isBlue) "Verde" else "Azul"}")
+            Text("Cambiar a ${if (isBlue) "Verde" else "Azul"}")
         }
+
         Box(
             modifier = Modifier
                 .size(200.dp)
@@ -295,7 +288,7 @@ fun Ejercicio2_AnimateColorAsState(modifier: Modifier = Modifier) {
 }
 
 // ----------------------------------------------------
-// 🚀 Ejercicio 1: Animación de Visibilidad con AnimatedVisibility
+// 🚀 Ejercicio 1
 // ----------------------------------------------------
 
 @Composable
@@ -307,14 +300,17 @@ fun Ejercicio1_AnimatedVisibility(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+
         Button(onClick = { isVisible = !isVisible }, modifier = Modifier.padding(bottom = 32.dp)) {
-            Text(text = if (isVisible) "Ocultar Cuadro" else "Mostrar Cuadro")
+            Text(if (isVisible) "Ocultar Cuadro" else "Mostrar Cuadro")
         }
 
         AnimatedVisibility(
             visible = isVisible,
-            enter = fadeIn(animationSpec = spring()) + expandVertically(expandFrom = Alignment.Top),
-            exit = fadeOut(animationSpec = spring()) + shrinkVertically(shrinkTowards = Alignment.Top)
+            enter = fadeIn(animationSpec = spring()) +
+                    expandVertically(expandFrom = Alignment.Top),
+            exit = fadeOut(animationSpec = spring()) +
+                    shrinkVertically(shrinkTowards = Alignment.Top)
         ) {
             Box(
                 modifier = Modifier
